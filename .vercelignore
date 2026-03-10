@@ -6,3 +6,10 @@
 .github
 README.md
 package.json
+fix-vercel.ps1
+update-paper.ps1
+deploy-pages.ps1
+deploy.ps1
+push.ps1
+commit.ps1
+commit.bat
