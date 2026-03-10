@@ -1,0 +1,8 @@
+# Vercel ignore file - ensure necessary files are deployed
+*.ps1
+*.bat
+*.log
+.git
+.github
+README.md
+package.json
