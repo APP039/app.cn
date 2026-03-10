@@ -1,0 +1,27 @@
+{
+  "name": "3d-paper-ball",
+  "version": "1.0.0",
+  "description": "A philosophical 3D interactive webpage featuring a rotating paper ball - 'Make a piece of trash first'",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": [
+    "3d",
+    "threejs",
+    "webgl",
+    "interactive",
+    "paper-ball",
+    "philosophy",
+    "design",
+    "minimalism"
+  ],
+  "author": "APP039",
+  "license": "MIT",
+  "homepage": "https://app039.github.io/app.cn",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/APP039/app.cn.git"
+  }
+}
