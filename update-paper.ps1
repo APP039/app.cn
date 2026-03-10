@@ -1,3 +1,3 @@
 git add .
-git commit -m "Update paper ball with more realistic texture and hand-drawn sketch effects"
+git commit -m "Replace procedural texture with paper-ball.png image"
 git push origin master

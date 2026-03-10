@@ -83,120 +83,36 @@
         controls.enableZoom = true;
         controls.enablePan = false;
         
-        // 创建真实纸团纹理的函数
-        function createRealisticPaperBall() {
-            // 使用高细分球体来模拟真实纸团的复杂表面
-            const geometry = new THREE.SphereGeometry(1, 64, 64);
+        // 创建纸张揉团的函数
+        function createPaperBall() {
+            // 基础球体几何体
+            const geometry = new THREE.SphereGeometry(1, 32, 32);
             
-            // 创建更复杂的不规则形状
+            // 修改顶点创建不规则的揉纸效果
             const positions = geometry.attributes.position.array;
-            const vertex = new THREE.Vector3();
-            
             for (let i = 0; i < positions.length; i += 3) {
-                vertex.set(positions[i], positions[i + 1], positions[i + 2]);
-                
-                // 使用多层噪声创建真实的纸团表面
-                const noise1 = Math.sin(vertex.x * 10) * Math.cos(vertex.y * 10) * 0.08;
-                const noise2 = Math.sin(vertex.y * 15) * Math.cos(vertex.z * 15) * 0.05;
-                const noise3 = Math.sin(vertex.z * 20) * 0.03;
-                const combinedNoise = noise1 + noise2 + noise3;
-                
-                // 添加随机褶皱
-                const randomFactor = 0.9 + Math.random() * 0.2;
-                const finalFactor = randomFactor + combinedNoise;
-                
-                positions[i] *= finalFactor;
-                positions[i + 1] *= finalFactor;
-                positions[i + 2] *= finalFactor;
+                const noise = (Math.random() - 0.5) * 0.3;
+                const factor = 0.8 + Math.random() * 0.4;
+                positions[i] *= factor + noise;
+                positions[i + 1] *= factor + noise;
+                positions[i + 2] *= factor + noise;
             }
-            
             geometry.attributes.position.needsUpdate = true;
             geometry.computeVertexNormals();
             
-            // 创建类似真实纸团的纹理
-            const canvas = document.createElement('canvas');
-            canvas.width = 1024;
-            canvas.height = 1024;
-            const context = canvas.getContext('2d');
-            
-            // 纸张底色
-            context.fillStyle = '#f5f5f5';
-            context.fillRect(0, 0, 1024, 1024);
-            
-            // 添加纸张纤维纹理
-            for (let i = 0; i < 300; i++) {
-                context.strokeStyle = `rgba(180, 180, 180, ${Math.random() * 0.2})`;
-                context.lineWidth = Math.random() * 1.5;
-                context.beginPath();
-                context.moveTo(Math.random() * 1024, Math.random() * 1024);
-                context.lineTo(Math.random() * 1024, Math.random() * 1024);
-                context.stroke();
-            }
-            
-            // 添加手绘草图线条
-            for (let i = 0; i < 50; i++) {
-                context.strokeStyle = `rgba(50, 50, 50, ${0.3 + Math.random() * 0.4})`;
-                context.lineWidth = Math.random() * 2 + 1;
-                context.beginPath();
-                const startX = Math.random() * 1024;
-                const startY = Math.random() * 1024;
-                context.moveTo(startX, startY);
-                
-                // 创建手绘风格的曲线
-                for (let j = 0; j < 5; j++) {
-                    context.lineTo(
-                        startX + (Math.random() - 0.5) * 200,
-                        startY + (Math.random() - 0.5) * 200
-                    );
-                }
-                context.stroke();
-            }
-            
-            // 添加折痕和阴影
-            for (let i = 0; i < 80; i++) {
-                context.strokeStyle = `rgba(100, 100, 100, ${Math.random() * 0.3})`;
-                context.lineWidth = Math.random() * 3 + 1;
-                context.beginPath();
-                const startX = Math.random() * 1024;
-                const startY = Math.random() * 1024;
-                context.moveTo(startX, startY);
-                context.quadraticCurveTo(
-                    Math.random() * 1024, Math.random() * 1024,
-                    Math.random() * 1024, Math.random() * 1024
-                );
-                context.stroke();
-            }
-            
-            // 添加文字涂鸦效果
-            context.font = 'italic 24px Georgia';
-            context.fillStyle = 'rgba(60, 60, 60, 0.6)';
-            context.save();
-            context.translate(200, 300);
-            context.rotate(-0.3);
-            context.fillText('make a piece of trash first', 0, 0);
-            context.restore();
-            
-            context.font = 'italic 18px Arial';
-            context.save();
-            context.translate(600, 700);
-            context.rotate(0.2);
-            context.fillText('create → destroy → create', 0, 0);
-            context.restore();
-            
-            const texture = new THREE.CanvasTexture(canvas);
+            // 加载纸团图片作为纹理
+            const textureLoader = new THREE.TextureLoader();
+            const texture = textureLoader.load('paper-ball.png');
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.RepeatWrapping;
             
-            // 创建更真实的材质
-            const material = new THREE.MeshStandardMaterial({
+            // 创建材质
+            const material = new THREE.MeshPhongMaterial({
                 map: texture,
                 color: 0xffffff,
-                roughness: 0.8,
-                metalness: 0.1,
-                shininess: 20,
+                shininess: 30,
                 transparent: true,
-                opacity: 0.98,
-                side: THREE.DoubleSide
+                opacity: 0.95
             });
             
             const paperBall = new THREE.Mesh(geometry, material);
@@ -207,48 +123,44 @@
         }
         
         // 创建纸张揉团
-        const paperBall = createRealisticPaperBall();
+        const paperBall = createPaperBall();
         scene.add(paperBall);
         
         // 添加发光效果
-        const glowGeometry = new THREE.SphereGeometry(1.3, 32, 32);
+        const glowGeometry = new THREE.SphereGeometry(1.2, 32, 32);
         const glowMaterial = new THREE.MeshBasicMaterial({
             color: 0x4a90e2,
             transparent: true,
-            opacity: 0.08,
+            opacity: 0.1,
             side: THREE.BackSide
         });
         const glow = new THREE.Mesh(glowGeometry, glowMaterial);
         scene.add(glow);
         
-        // 添加边缘光晕
+        // 添加边缘发光
         const edgeGeometry = new THREE.EdgesGeometry(paperBall.geometry);
         const edgeMaterial = new THREE.LineBasicMaterial({ 
             color: 0x6bb6ff, 
             transparent: true, 
-            opacity: 0.15 
+            opacity: 0.3 
         });
         const edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
         paperBall.add(edges);
         
         // 灯光设置
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.7);
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
         scene.add(ambientLight);
         
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
         directionalLight.position.set(5, 5, 5);
         directionalLight.castShadow = true;
         directionalLight.shadow.mapSize.width = 2048;
         directionalLight.shadow.mapSize.height = 2048;
         scene.add(directionalLight);
         
-        const pointLight1 = new THREE.PointLight(0x4a90e2, 0.6, 10);
-        pointLight1.position.set(-3, 2, 3);
-        scene.add(pointLight1);
-        
-        const pointLight2 = new THREE.PointLight(0x6bb6ff, 0.4, 8);
-        pointLight2.position.set(3, -2, 2);
-        scene.add(pointLight2);
+        const pointLight = new THREE.PointLight(0x4a90e2, 0.5, 10);
+        pointLight.position.set(-3, 2, 3);
+        scene.add(pointLight);
         
         // 动画循环
         function animate() {
@@ -260,7 +172,7 @@
             
             // 发光效果动画
             glow.material.opacity = 0.05 + Math.sin(Date.now() * 0.001) * 0.05;
-            edges.material.opacity = 0.1 + Math.sin(Date.now() * 0.002) * 0.1;
+            edges.material.opacity = 0.2 + Math.sin(Date.now() * 0.002) * 0.1;
             
             controls.update();
             renderer.render(scene, camera);
